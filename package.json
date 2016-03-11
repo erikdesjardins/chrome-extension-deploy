@@ -1,0 +1,22 @@
+{
+  "name": "chrome-extension-deploy",
+  "version": "0.0.0",
+  "description": "Deploy Chrome extensions to the Chrome Web Store.",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erikdesjardins/chrome-extension-deploy.git"
+  },
+  "author": "Erik Desjardins",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/erikdesjardins/chrome-extension-deploy/issues"
+  },
+  "homepage": "https://github.com/erikdesjardins/chrome-extension-deploy#readme",
+  "devDependencies": {
+    "ava": "^0.13.0"
+  }
+}
