@@ -18,5 +18,8 @@
   "homepage": "https://github.com/erikdesjardins/chrome-extension-deploy#readme",
   "devDependencies": {
     "ava": "^0.13.0"
+  },
+  "dependencies": {
+    "superagent": "^1.8.0"
   }
 }
