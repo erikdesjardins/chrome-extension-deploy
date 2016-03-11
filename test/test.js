@@ -4,6 +4,22 @@ import superagentMock from 'superagent-mock';
 
 import deploy from '../index.js';
 
+test.before(t => {
+	t.context.mock = superagentMock(superagent, [{
+		pattern: 'https://accounts.google.com/o/oauth2/token',
+		fixtures(match, params, headers) {
+
+		},
+		post(match, data) {
+
+		}
+	}]);
+});
+
+test.after(t => {
+	t.context.mock.unset();
+});
+
 test('missing fields', t => {
 	t.throws(
 		() => deploy({ clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
