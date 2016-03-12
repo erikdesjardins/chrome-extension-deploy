@@ -13,11 +13,16 @@ var PUBLIC = 'PUBLIC';
 var TRUSTED_TESTERS = 'TRUSTED_TESTERS';
 
 module.exports = function deploy(options) {
-	REQUIRED_FIELDS.forEach(function(field) {
+	const fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
+		if (err) return err;
 		if (!options[field]) {
-			throw new Error('Missing required field: ' + field);
+			return new Error('Missing required field: ' + field);
 		}
-	});
+	}, null);
+
+	if (fieldError) {
+		return Promise.reject(fieldError);
+	}
 
 	var clientId = options.clientId;
 	var clientSecret = options.clientSecret;
