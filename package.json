@@ -1,6 +1,6 @@
 {
   "name": "chrome-extension-deploy",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Deploy Chrome extensions to the Chrome Web Store.",
   "main": "index.js",
   "scripts": {
