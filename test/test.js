@@ -42,6 +42,11 @@ test.beforeEach(t => {
 		post(match, data) {
 			return { body: data };
 		}
+	}, {
+		pattern: '.*',
+		fixtures(match) {
+			throw new Error('No mocked endpoint for: ' + match);
+		}
 	}]);
 });
 
