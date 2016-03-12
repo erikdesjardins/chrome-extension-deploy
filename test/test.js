@@ -54,7 +54,7 @@ test.afterEach(t => {
 	t.context.mock.unset();
 });
 
-test('missing fields', t => {
+test.serial('missing fields', t => {
 	t.throws(
 		deploy({ clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Missing required field: clientId'
