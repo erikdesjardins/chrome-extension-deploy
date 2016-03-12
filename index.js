@@ -31,6 +31,10 @@ module.exports = function deploy(options) {
 	var zipFile = options.zip;
 	var publishTo = options.to || PUBLIC;
 
+	if (publishTo !== PUBLIC && publishTo !== TRUSTED_TESTERS) {
+		return Promise.reject(new Error('Invalid publish target: ' + publishTo));
+	}
+
 	var accessToken;
 
 	return Promise.resolve()
