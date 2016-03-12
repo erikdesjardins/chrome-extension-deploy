@@ -7,7 +7,7 @@ import deploy from '../index.js';
 test.beforeEach(t => {
 	t.context.requests = [];
 	t.context.mock = superagentMock(superagent, [{
-		pattern: '(https://accounts.google.com/o/oauth2/token)',
+		pattern: '^https://accounts.google.com/o/oauth2/token$',
 		fixtures(match, params, headers) {
 			t.context.requests.push({ match, params, headers });
 			if (t.context.tokenFail) {
@@ -19,7 +19,7 @@ test.beforeEach(t => {
 			return { body: data };
 		}
 	}, {
-		pattern: '(https://www.googleapis.com/upload/chromewebstore/v1.1/items/\\w+)',
+		pattern: '^https://www.googleapis.com/upload/chromewebstore/v1.1/items/(\\w+)$',
 		fixtures(match, params, headers) {
 			t.context.requests.push({ match, params, headers });
 			if (t.context.uploadFail) {
@@ -31,7 +31,7 @@ test.beforeEach(t => {
 			return { body: data };
 		}
 	}, {
-		pattern: '(https://www.googleapis.com/upload/chromewebstore/v1.1/items/\\w+/publish)',
+		pattern: '^https://www.googleapis.com/chromewebstore/v1.1/items/(\\w+)/publish$',
 		fixtures(match, params, headers) {
 			t.context.requests.push({ match, params, headers });
 			if (t.context.publishFail) {
