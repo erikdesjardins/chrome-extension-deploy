@@ -4,7 +4,7 @@ import superagentMock from 'superagent-mock';
 
 import deploy from '../index.js';
 
-test.before(t => {
+test.beforeEach(t => {
 	t.context.mock = superagentMock(superagent, [{
 		pattern: 'https://accounts.google.com/o/oauth2/token',
 		fixtures(match, params, headers) {
@@ -16,7 +16,7 @@ test.before(t => {
 	}]);
 });
 
-test.after(t => {
+test.afterEach(t => {
 	t.context.mock.unset();
 });
 
