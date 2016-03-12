@@ -76,3 +76,143 @@ test('missing fields', t => {
 		'Missing required field: zip'
 	);
 });
+
+test.serial('failing access token', async t => {
+	t.context.tokenFail = true;
+
+	await t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Failed to fetch access token.'
+	);
+
+	t.is(t.context.requests.length, 1, 'stopped after failure');
+});
+
+test.serial('no access token', async t => {
+	t.context.tokenResponse = {};
+
+	await t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'No access token received.'
+	);
+
+	t.is(t.context.requests.length, 1, 'stopped after failure');
+});
+
+test.serial('failing upload', async t => {
+	t.context.tokenResponse = { access_token: 'hi' };
+	t.context.uploadFail = true;
+
+	await t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Failed to upload package.'
+	);
+
+	t.is(t.context.requests.length, 2, 'stopped after failure');
+});
+
+test.serial('invalid upload state', async t => {
+	t.context.tokenResponse = { access_token: 'hi' };
+	t.context.uploadResponse = { uploadState: 'FAILURE' };
+
+	await t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Upload state "FAILURE" !== "SUCCESS".'
+	);
+
+	t.is(t.context.requests.length, 2, 'stopped after failure');
+});
+
+test.serial('failing publish', t => {
+	t.context.tokenResponse = { access_token: 'hi' };
+	t.context.uploadResponse = { uploadState: 'SUCCESS' };
+	t.context.publishFail = true;
+
+	t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Failed to publish package.'
+	);
+});
+
+test.serial('invalid publish status', t => {
+	t.context.tokenResponse = { access_token: 'hi' };
+	t.context.uploadResponse = { uploadState: 'SUCCESS' };
+	t.context.publishResponse = { status: ['ERR'] };
+
+	t.throws(
+		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Publish status "ERR" !== "OK".'
+	);
+});
+
+test.serial('public deploy', async t => {
+	t.context.tokenResponse = { access_token: 'someaccesstoken' };
+	t.context.uploadResponse = { uploadState: 'SUCCESS' };
+	t.context.publishResponse = { status: ['OK'] };
+
+	await deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'someid', zip: 'somezip' });
+
+	const { requests: [tokenReq, uploadReq, publishReq] } = t.context;
+
+	t.is(tokenReq.match[0], 'https://accounts.google.com/o/oauth2/token');
+
+	t.is(uploadReq.match[1], 'someid');
+	t.is(uploadReq.headers['Authorization'], 'Bearer someaccesstoken');
+	t.is(uploadReq.headers['x-goog-api-version'], 2);
+	t.is(uploadReq.headers['Content-Type'], 'application/zip');
+	t.is(uploadReq.params, 'somezip');
+
+	t.is(publishReq.match[1], 'someid');
+	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken');
+	t.is(publishReq.headers['x-goog-api-version'], 2);
+	t.is(publishReq.headers['Content-Length'], 0);
+	t.notOk('publishTarget' in publishReq.headers);
+});
+
+test.serial('explicit public deploy', async t => {
+	t.context.tokenResponse = { access_token: 'someaccesstoken2' };
+	t.context.uploadResponse = { uploadState: 'SUCCESS' };
+	t.context.publishResponse = { status: ['OK'] };
+
+	await deploy({ to: deploy.PUBLIC, clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'someid2', zip: 'somezip2' });
+
+	const { requests: [tokenReq, uploadReq, publishReq] } = t.context;
+
+	t.is(tokenReq.match[0], 'https://accounts.google.com/o/oauth2/token');
+
+	t.is(uploadReq.match[1], 'someid2');
+	t.is(uploadReq.headers['Authorization'], 'Bearer someaccesstoken2');
+	t.is(uploadReq.headers['x-goog-api-version'], 2);
+	t.is(uploadReq.headers['Content-Type'], 'application/zip');
+	t.is(uploadReq.params, 'somezip2');
+
+	t.is(publishReq.match[1], 'someid2');
+	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken2');
+	t.is(publishReq.headers['x-goog-api-version'], 2);
+	t.is(publishReq.headers['Content-Length'], 0);
+	t.notOk('publishTarget' in publishReq.headers);
+});
+
+test.serial('deploy to trusted testers', async t => {
+	t.context.tokenResponse = { access_token: 'someaccesstoken3' };
+	t.context.uploadResponse = { uploadState: 'SUCCESS' };
+	t.context.publishResponse = { status: ['OK'] };
+
+	await deploy({ to: deploy.TRUSTED_TESTERS, clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'someid3', zip: 'somezip3' });
+
+	const { requests: [tokenReq, uploadReq, publishReq] } = t.context;
+
+	t.is(tokenReq.match[0], 'https://accounts.google.com/o/oauth2/token');
+
+	t.is(uploadReq.match[1], 'someid3');
+	t.is(uploadReq.headers['Authorization'], 'Bearer someaccesstoken3');
+	t.is(uploadReq.headers['x-goog-api-version'], 2);
+	t.is(uploadReq.headers['Content-Type'], 'application/zip');
+	t.is(uploadReq.params, 'somezip3');
+
+	t.is(publishReq.match[1], 'someid3');
+	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken3');
+	t.is(publishReq.headers['x-goog-api-version'], 2);
+	t.is(publishReq.headers['Content-Length'], 0);
+	t.is(publishReq.headers['publishTarget'], 'trustedTesters');
+});
