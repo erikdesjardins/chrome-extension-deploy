@@ -77,6 +77,13 @@ test.serial('missing fields', t => {
 	);
 });
 
+test.serial('invalid publish target', t => {
+	t.throws(
+		deploy({ to: 'foobar', clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
+		'Invalid publish target: foobar'
+	);
+});
+
 test.serial('failing access token', async t => {
 	t.context.tokenFail = true;
 
