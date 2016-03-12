@@ -17,6 +17,12 @@
   },
   "homepage": "https://github.com/erikdesjardins/chrome-extension-deploy#readme",
   "devDependencies": {
-    "ava": "^0.13.0"
+    "ava": "^0.13.0",
+    "coveralls": "^2.11.8",
+    "nyc": "^6.0.0",
+    "superagent-mock": "^1.10.0"
+  },
+  "dependencies": {
+    "superagent": "^1.8.0"
   }
 }
