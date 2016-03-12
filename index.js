@@ -78,7 +78,7 @@ module.exports = function deploy(options) {
 				.set('Content-Length', 0);
 
 			if (publishTo === TRUSTED_TESTERS) {
-				request.set('publishTarget', 'trustedTesters');
+				req.set('publishTarget', 'trustedTesters');
 			}
 
 			return Promise.resolve(req)
