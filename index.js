@@ -13,7 +13,7 @@ var PUBLIC = 'PUBLIC';
 var TRUSTED_TESTERS = 'TRUSTED_TESTERS';
 
 module.exports = function deploy(options) {
-	const fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
+	var fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
 		if (err) return err;
 		if (!options[field]) {
 			return new Error('Missing required field: ' + field);
