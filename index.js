@@ -46,6 +46,9 @@ module.exports = function deploy(options) {
 			return Promise.resolve(req)
 				.then(function(response) {
 					accessToken = response.body.access_token;
+					if (!accessToken) {
+						throw new Error('No access token received.');
+					}
 				}, function() {
 					throw new Error('Failed to fetch access token.');
 				});
