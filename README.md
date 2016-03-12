@@ -16,9 +16,8 @@ var fs = require('fs');
 var deploy = require('chrome-extension-deploy');
 
 deploy({
-  // clientId, clientSecret and refreshToken obtained by following the instructions here:
+  // obtained by following the instructions here:
   // https://developer.chrome.com/webstore/using_webstore_api#beforeyoubegin
-  // unfortunately it seems that you cannot use an ordinary private key, you must use OAuth
   clientId: 'myClientId',
   clientSecret: 'myClientSecret',
   refreshToken: 'myRefreshToken',
@@ -36,6 +35,6 @@ deploy({
   // success!
 }, function(err) {
   // failure :(
-  // errors are sanitized, so your clientId/clientSecret/refreshToken will not be leaked
+  // errors are sanitized, so your tokens will not be leaked
 });
 ```
