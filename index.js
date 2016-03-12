@@ -13,11 +13,16 @@ var PUBLIC = 'PUBLIC';
 var TRUSTED_TESTERS = 'TRUSTED_TESTERS';
 
 module.exports = function deploy(options) {
-	REQUIRED_FIELDS.forEach(function(field) {
+	var fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
+		if (err) return err;
 		if (!options[field]) {
-			throw new Error('Missing required field: ' + field);
+			return new Error('Missing required field: ' + field);
 		}
-	});
+	}, null);
+
+	if (fieldError) {
+		return Promise.reject(fieldError);
+	}
 
 	var clientId = options.clientId;
 	var clientSecret = options.clientSecret;
@@ -41,6 +46,9 @@ module.exports = function deploy(options) {
 			return Promise.resolve(req)
 				.then(function(response) {
 					accessToken = response.body.access_token;
+					if (!accessToken) {
+						throw new Error('No access token received.');
+					}
 				}, function() {
 					throw new Error('Failed to fetch access token.');
 				});
@@ -70,7 +78,7 @@ module.exports = function deploy(options) {
 				.set('Content-Length', 0);
 
 			if (publishTo === TRUSTED_TESTERS) {
-				request.set('publishTarget', 'trustedTesters');
+				req.set('publishTarget', 'trustedTesters');
 			}
 
 			return Promise.resolve(req)
