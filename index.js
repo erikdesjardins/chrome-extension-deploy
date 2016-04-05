@@ -7,23 +7,12 @@
 
 var request = require('superagent');
 
-var REQUIRED_FIELDS = ['clientId', 'clientSecret', 'refreshToken', 'id', 'zip'];
-
 var PUBLIC = 'PUBLIC';
 var TRUSTED_TESTERS = 'TRUSTED_TESTERS';
 
+var REQUIRED_FIELDS = ['clientId', 'clientSecret', 'refreshToken', 'id', 'zip'];
+
 module.exports = function deploy(options) {
-	var fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
-		if (err) return err;
-		if (!options[field]) {
-			return new Error('Missing required field: ' + field);
-		}
-	}, null);
-
-	if (fieldError) {
-		return Promise.reject(fieldError);
-	}
-
 	var clientId = options.clientId;
 	var clientSecret = options.clientSecret;
 	var refreshToken = options.refreshToken;
@@ -31,11 +20,18 @@ module.exports = function deploy(options) {
 	var zipFile = options.zip;
 	var publishTo = options.to || PUBLIC;
 
-	if (publishTo !== PUBLIC && publishTo !== TRUSTED_TESTERS) {
-		return Promise.reject(new Error('Invalid publish target: ' + publishTo));
-	}
-
 	return Promise.resolve()
+		.then(function() {
+			REQUIRED_FIELDS.forEach(function(field) {
+				if (!options[field]) {
+					throw new Error('Missing required field: ' + field);
+				}
+			});
+
+			if (publishTo !== PUBLIC && publishTo !== TRUSTED_TESTERS) {
+				throw new Error('Invalid publish target: ' + publishTo);
+			}
+		})
 		.then(function() {
 			var req = request
 				.post('https://accounts.google.com/o/oauth2/token')
