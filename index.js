@@ -35,8 +35,6 @@ module.exports = function deploy(options) {
 		return Promise.reject(new Error('Invalid publish target: ' + publishTo));
 	}
 
-	var accessToken;
-
 	return Promise.resolve()
 		.then(function() {
 			var req = request
@@ -49,15 +47,16 @@ module.exports = function deploy(options) {
 
 			return Promise.resolve(req)
 				.then(function(response) {
-					accessToken = response.body.access_token;
+					var accessToken = response.body.access_token;
 					if (!accessToken) {
 						throw new Error('No access token received.');
 					}
+					return accessToken;
 				}, function() {
 					throw new Error('Failed to fetch access token.');
 				});
 		})
-		.then(function() {
+		.then(function(accessToken) {
 			var req = request
 				.put('https://www.googleapis.com/upload/chromewebstore/v1.1/items/' + extensionId)
 				.set('Authorization', 'Bearer ' + accessToken)
@@ -70,11 +69,12 @@ module.exports = function deploy(options) {
 					if (response.body.uploadState !== 'SUCCESS') {
 						throw new Error('Upload state "' + response.body.uploadState + '" !== "SUCCESS".');
 					}
+					return accessToken;
 				}, function() {
 					throw new Error('Failed to upload package.');
 				});
 		})
-		.then(function() {
+		.then(function(accessToken) {
 			var req = request
 				.post('https://www.googleapis.com/chromewebstore/v1.1/items/' + extensionId + '/publish')
 				.set('Authorization', 'Bearer ' + accessToken)
