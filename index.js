@@ -21,6 +21,7 @@ module.exports = function deploy(options) {
 	var publishTo = options.to || PUBLIC;
 
 	return Promise.resolve()
+		// options validation
 		.then(function() {
 			REQUIRED_FIELDS.forEach(function(field) {
 				if (!options[field]) {
@@ -32,6 +33,7 @@ module.exports = function deploy(options) {
 				throw new Error('Invalid publish target: ' + publishTo);
 			}
 		})
+		// fetch access token
 		.then(function() {
 			var req = request
 				.post('https://accounts.google.com/o/oauth2/token')
@@ -52,6 +54,7 @@ module.exports = function deploy(options) {
 					throw new Error('Failed to fetch access token.');
 				});
 		})
+		// upload extension
 		.then(function(accessToken) {
 			var req = request
 				.put('https://www.googleapis.com/upload/chromewebstore/v1.1/items/' + extensionId)
@@ -70,6 +73,7 @@ module.exports = function deploy(options) {
 					throw new Error('Failed to upload package.');
 				});
 		})
+		// deploy extension
 		.then(function(accessToken) {
 			var req = request
 				.post('https://www.googleapis.com/chromewebstore/v1.1/items/' + extensionId + '/publish')
