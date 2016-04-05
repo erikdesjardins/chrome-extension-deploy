@@ -173,7 +173,7 @@ test.serial('public deploy', async t => {
 	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken');
 	t.is(publishReq.headers['x-goog-api-version'], 2);
 	t.is(publishReq.headers['Content-Length'], 0);
-	t.notOk('publishTarget' in publishReq.headers);
+	t.false('publishTarget' in publishReq.headers);
 });
 
 test.serial('explicit public deploy', async t => {
@@ -197,7 +197,7 @@ test.serial('explicit public deploy', async t => {
 	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken2');
 	t.is(publishReq.headers['x-goog-api-version'], 2);
 	t.is(publishReq.headers['Content-Length'], 0);
-	t.notOk('publishTarget' in publishReq.headers);
+	t.false('publishTarget' in publishReq.headers);
 });
 
 test.serial('deploy to trusted testers', async t => {

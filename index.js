@@ -7,23 +7,12 @@
 
 var request = require('superagent');
 
-var REQUIRED_FIELDS = ['clientId', 'clientSecret', 'refreshToken', 'id', 'zip'];
-
 var PUBLIC = 'PUBLIC';
 var TRUSTED_TESTERS = 'TRUSTED_TESTERS';
 
+var REQUIRED_FIELDS = ['clientId', 'clientSecret', 'refreshToken', 'id', 'zip'];
+
 module.exports = function deploy(options) {
-	var fieldError = REQUIRED_FIELDS.reduce(function(err, field) {
-		if (err) return err;
-		if (!options[field]) {
-			return new Error('Missing required field: ' + field);
-		}
-	}, null);
-
-	if (fieldError) {
-		return Promise.reject(fieldError);
-	}
-
 	var clientId = options.clientId;
 	var clientSecret = options.clientSecret;
 	var refreshToken = options.refreshToken;
@@ -31,13 +20,20 @@ module.exports = function deploy(options) {
 	var zipFile = options.zip;
 	var publishTo = options.to || PUBLIC;
 
-	if (publishTo !== PUBLIC && publishTo !== TRUSTED_TESTERS) {
-		return Promise.reject(new Error('Invalid publish target: ' + publishTo));
-	}
-
-	var accessToken;
-
 	return Promise.resolve()
+		// options validation
+		.then(function() {
+			REQUIRED_FIELDS.forEach(function(field) {
+				if (!options[field]) {
+					throw new Error('Missing required field: ' + field);
+				}
+			});
+
+			if (publishTo !== PUBLIC && publishTo !== TRUSTED_TESTERS) {
+				throw new Error('Invalid publish target: ' + publishTo);
+			}
+		})
+		// fetch access token
 		.then(function() {
 			var req = request
 				.post('https://accounts.google.com/o/oauth2/token')
@@ -49,15 +45,17 @@ module.exports = function deploy(options) {
 
 			return Promise.resolve(req)
 				.then(function(response) {
-					accessToken = response.body.access_token;
+					var accessToken = response.body.access_token;
 					if (!accessToken) {
 						throw new Error('No access token received.');
 					}
+					return accessToken;
 				}, function() {
 					throw new Error('Failed to fetch access token.');
 				});
 		})
-		.then(function() {
+		// upload extension
+		.then(function(accessToken) {
 			var req = request
 				.put('https://www.googleapis.com/upload/chromewebstore/v1.1/items/' + extensionId)
 				.set('Authorization', 'Bearer ' + accessToken)
@@ -70,11 +68,13 @@ module.exports = function deploy(options) {
 					if (response.body.uploadState !== 'SUCCESS') {
 						throw new Error('Upload state "' + response.body.uploadState + '" !== "SUCCESS".');
 					}
+					return accessToken;
 				}, function() {
 					throw new Error('Failed to upload package.');
 				});
 		})
-		.then(function() {
+		// deploy extension
+		.then(function(accessToken) {
 			var req = request
 				.post('https://www.googleapis.com/chromewebstore/v1.1/items/' + extensionId + '/publish')
 				.set('Authorization', 'Bearer ' + accessToken)
