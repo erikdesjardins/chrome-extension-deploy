@@ -82,7 +82,7 @@ module.exports = function deploy(options) {
 				.set('Content-Length', 0);
 
 			if (publishTo === TRUSTED_TESTERS) {
-				req.set('publishTarget', 'trustedTesters');
+				req.set('publish_to_trusted_testers', 'true');
 			}
 
 			return Promise.resolve(req)
