@@ -221,5 +221,5 @@ test.serial('deploy to trusted testers', async t => {
 	t.is(publishReq.headers['Authorization'], 'Bearer someaccesstoken3');
 	t.is(publishReq.headers['x-goog-api-version'], 2);
 	t.is(publishReq.headers['Content-Length'], 0);
-	t.is(publishReq.headers['publishTarget'], 'trustedTesters');
+	t.is(publishReq.headers['publish_to_trusted_testers'], 'true');
 });
