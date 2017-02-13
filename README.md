@@ -2,6 +2,8 @@
 
 Deploy Chrome extensions to the Chrome Web Store.
 
+You should probably use [chrome-webstore-upload](https://github.com/DrewML/chrome-webstore-upload) or [chrome-webstore-upload-cli](https://github.com/DrewML/chrome-webstore-upload-cli) instead.
+
 ## Installation
 
 `npm install --save-dev chrome-extension-deploy`
