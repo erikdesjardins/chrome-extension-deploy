@@ -3,6 +3,10 @@ node_js:
   - "5"
   - "4"
   - "0.12"
+branches:
+  only:
+    - master
+    - /^v[0-9]/
 script:
   - nyc npm test
 after_success:
