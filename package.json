@@ -1,6 +1,6 @@
 {
   "name": "chrome-extension-deploy",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "description": "Deploy Chrome extensions to the Chrome Web Store.",
   "main": "index.js",
   "scripts": {
@@ -17,12 +17,12 @@
   },
   "homepage": "https://github.com/erikdesjardins/chrome-extension-deploy#readme",
   "devDependencies": {
-    "ava": "^0.13.0",
-    "coveralls": "^2.11.8",
-    "nyc": "^6.0.0",
-    "superagent-mock": "^1.10.0"
+    "ava": "^0.18.0",
+    "coveralls": "^2.11.16",
+    "nyc": "^10.1.2",
+    "superagent-mock": "^3.2.0"
   },
   "dependencies": {
-    "superagent": "^1.8.0"
+    "superagent": "^3.4.1"
   }
 }

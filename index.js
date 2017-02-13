@@ -35,15 +35,13 @@ module.exports = function deploy(options) {
 		})
 		// fetch access token
 		.then(function() {
-			var req = request
+			return request
 				.post('https://accounts.google.com/o/oauth2/token')
 				.field('client_id', clientId)
 				.field('client_secret', clientSecret)
 				.field('refresh_token', refreshToken)
 				.field('grant_type', 'refresh_token')
-				.field('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob');
-
-			return Promise.resolve(req)
+				.field('redirect_uri', 'urn:ietf:wg:oauth:2.0:oob')
 				.then(function(response) {
 					var accessToken = response.body.access_token;
 					if (!accessToken) {
@@ -56,14 +54,12 @@ module.exports = function deploy(options) {
 		})
 		// upload extension
 		.then(function(accessToken) {
-			var req = request
+			return request
 				.put('https://www.googleapis.com/upload/chromewebstore/v1.1/items/' + extensionId)
 				.set('Authorization', 'Bearer ' + accessToken)
 				.set('x-goog-api-version', 2)
 				.type('application/zip')
-				.send(zipFile);
-
-			return Promise.resolve(req)
+				.send(zipFile)
 				.then(function(response) {
 					if (response.body.uploadState !== 'SUCCESS') {
 						throw new Error('Upload state "' + response.body.uploadState + '" !== "SUCCESS".');
@@ -88,7 +84,7 @@ module.exports = function deploy(options) {
 				});
 			}
 
-			return Promise.resolve(req)
+			return req
 				.then(function(response) {
 					if (response.body.status[0] !== 'OK') {
 						throw new Error('Publish status "' + response.body.status[0] + '" !== "OK".');
