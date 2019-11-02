@@ -54,31 +54,31 @@ test.afterEach(t => {
 	t.context.mock.unset();
 });
 
-test.serial('missing fields', t => {
-	t.throws(
+test.serial('missing fields', async t => {
+	await t.throwsAsync(
 		deploy({ clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Missing required field: clientId'
 	);
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Missing required field: clientSecret'
 	);
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', id: 'q', zip: 'q' }),
 		'Missing required field: refreshToken'
 	);
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', zip: 'q' }),
 		'Missing required field: id'
 	);
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q' }),
 		'Missing required field: zip'
 	);
 });
 
-test.serial('invalid publish target', t => {
-	t.throws(
+test.serial('invalid publish target', async t => {
+	await t.throwsAsync(
 		deploy({ to: 'foobar', clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Invalid publish target: foobar'
 	);
@@ -87,7 +87,7 @@ test.serial('invalid publish target', t => {
 test.serial('failing access token', async t => {
 	t.context.tokenFail = true;
 
-	await t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Failed to fetch access token.'
 	);
@@ -98,7 +98,7 @@ test.serial('failing access token', async t => {
 test.serial('no access token', async t => {
 	t.context.tokenResponse = {};
 
-	await t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'No access token received.'
 	);
@@ -110,7 +110,7 @@ test.serial('failing upload', async t => {
 	t.context.tokenResponse = { access_token: 'hi' };
 	t.context.uploadFail = true;
 
-	await t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Failed to upload package.'
 	);
@@ -122,7 +122,7 @@ test.serial('invalid upload state', async t => {
 	t.context.tokenResponse = { access_token: 'hi' };
 	t.context.uploadResponse = { uploadState: 'FAILURE' };
 
-	await t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Upload state "FAILURE" !== "SUCCESS".'
 	);
@@ -130,23 +130,23 @@ test.serial('invalid upload state', async t => {
 	t.is(t.context.requests.length, 2, 'stopped after failure');
 });
 
-test.serial('failing publish', t => {
+test.serial('failing publish', async t => {
 	t.context.tokenResponse = { access_token: 'hi' };
 	t.context.uploadResponse = { uploadState: 'SUCCESS' };
 	t.context.publishFail = true;
 
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Failed to publish package.'
 	);
 });
 
-test.serial('invalid publish status', t => {
+test.serial('invalid publish status', async t => {
 	t.context.tokenResponse = { access_token: 'hi' };
 	t.context.uploadResponse = { uploadState: 'SUCCESS' };
 	t.context.publishResponse = { status: ['ERR'] };
 
-	t.throws(
+	await t.throwsAsync(
 		deploy({ clientId: 'q', clientSecret: 'q', refreshToken: 'q', id: 'q', zip: 'q' }),
 		'Publish status "ERR" !== "OK".'
 	);
