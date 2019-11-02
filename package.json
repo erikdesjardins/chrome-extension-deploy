@@ -4,7 +4,9 @@
   "description": "Deploy Chrome extensions to the Chrome Web Store.",
   "main": "index.js",
   "scripts": {
-    "test": "ava test/test.js"
+    "test": "ava test/test.js",
+    "test-coverage": "nyc npm test",
+    "report-coverage": "nyc report --reporter=text --reporter=html"
   },
   "repository": {
     "type": "git",
@@ -17,9 +19,8 @@
   },
   "homepage": "https://github.com/erikdesjardins/chrome-extension-deploy#readme",
   "devDependencies": {
-    "ava": "^0.18.0",
-    "coveralls": "^2.11.16",
-    "nyc": "^10.1.2",
+    "ava": "^2.4.0",
+    "nyc": "^14.1.1",
     "superagent-mock": "^3.2.0"
   },
   "dependencies": {
